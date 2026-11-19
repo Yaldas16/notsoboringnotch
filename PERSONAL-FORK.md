@@ -4,7 +4,7 @@ The fork starts at Boring Notch `v2.8-rc.2` (`1fa326d56b6ae7165afea934282449892e
 
 ## Build and install
 
-Push the personal branch under `personal-fork/` to trigger **Build Boring Notch Personal**. The workflow uses an arm64 macOS 26 runner, Xcode 26.6 and the Swift package lockfile. It builds the Release app, verifies the extracted ZIP and runs the existing hosted macOS tests in Debug. Artifacts expire after 14 days and are accessible to signed-in users with read access to the repository.
+Push the personal branch under `personal-fork/` to trigger **Build Boring Notch Personal**. The workflow uses an arm64 macOS 26 runner with Xcode 26.6 and the Swift package lockfile. A manual run can select an arm64 macOS 15 runner with Xcode 26.3. It builds the Release app, verifies the extracted ZIP and runs the existing hosted macOS tests in Debug. Artifacts expire after 14 days and are accessible to signed-in users with read access to the repository.
 
 1. Open the run for the desired commit in the fork's **Actions** tab, then download **Boring-Notch-Personal-arm64** from its Artifacts section. Extract the Actions download and open the inner `Boring-Notch-Personal-arm64.zip`.
 2. Quit any running Boring Notch instance during testing, then drag **Boring Notch Personal.app** to Applications. Open it through Finder and complete onboarding. The official app can stay installed under its own name.
