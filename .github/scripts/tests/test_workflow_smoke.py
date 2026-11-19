@@ -307,21 +307,20 @@ class WorkflowSmokeTests(unittest.TestCase):
         for removed in ("immutable", ".immutable", "immutable-release"):
             self.assertNotIn(removed, self.nightly)
 
-    def test_built_product_is_named_boring_notch(self) -> None:
-        # The Xcode product and app bundle are "Boring Notch", while the public
-        # DMG keeps the legacy boringNotch.dmg name for download/appcast
-        # compatibility. The project/target/scheme remain boringNotch.
+    def test_personal_build_uses_a_distinct_product_name(self) -> None:
+        # The project, module, target and scheme keep their upstream names.
         pbxproj = (
             REPOSITORY_ROOT / "boringNotch.xcodeproj" / "project.pbxproj"
         ).read_text(encoding="utf-8")
-        self.assertEqual(pbxproj.count('PRODUCT_NAME = "Boring Notch";'), 2)
+        self.assertEqual(pbxproj.count('PRODUCT_NAME = "Boring Notch Personal";'), 2)
         self.assertEqual(pbxproj.count('PRODUCT_MODULE_NAME = boringNotch;'), 2)
-        self.assertEqual(pbxproj.count('INFOPLIST_KEY_CFBundleName = "Boring Notch";'), 2)
-        self.assertEqual(pbxproj.count('INFOPLIST_KEY_CFBundleDisplayName = "Boring Notch";'), 2)
+        self.assertEqual(pbxproj.count('INFOPLIST_KEY_CFBundleName = "Boring Notch Personal";'), 2)
+        self.assertEqual(pbxproj.count('INFOPLIST_KEY_CFBundleDisplayName = "Boring Notch Personal";'), 2)
+        self.assertEqual(pbxproj.count('PRODUCT_BUNDLE_IDENTIFIER = local.boringnotch.personal;'), 2)
         self.assertEqual(
             pbxproj.count(
-                'TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Boring Notch.app/'
-                '$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Boring Notch";'
+                'TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Boring Notch Personal.app/'
+                '$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Boring Notch Personal";'
             ),
             2,
         )
@@ -333,9 +332,9 @@ class WorkflowSmokeTests(unittest.TestCase):
             / "xcschemes"
             / "boringNotch.xcscheme"
         ).read_text(encoding="utf-8")
-        self.assertEqual(scheme.count('BuildableName = "Boring Notch.app"'), 3)
+        self.assertEqual(scheme.count('BuildableName="Boring Notch Personal.app"'), 2)
         self.assertIn("<TestAction", scheme)
-        self.assertIn('BlueprintName = "boringNotchTests"', scheme)
+        self.assertIn('BlueprintName="boringNotchTests"', scheme)
 
         # Reusable build: archives under the project name, exports the app under
         # APP_NAME, and publishes the compatibility DMG under PROJECT_NAME.

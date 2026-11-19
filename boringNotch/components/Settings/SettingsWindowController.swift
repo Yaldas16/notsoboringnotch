@@ -8,11 +8,9 @@
 import AppKit
 import SwiftUI
 import Defaults
-import Sparkle
 
 class SettingsWindowController: NSWindowController {
     static let shared = SettingsWindowController()
-    private var updaterController: SPUStandardUpdaterController?
     private var camera: CameraModel?
 
     private init() {
@@ -32,12 +30,6 @@ class SettingsWindowController: NSWindowController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setUpdaterController(_ controller: SPUStandardUpdaterController) {
-        self.updaterController = controller
-        // Recreate the content view with the proper updater controller
-        setupWindow()
-    }
-
     func setCamera(_ camera: CameraModel) {
         self.camera = camera
         setupWindow()
@@ -46,7 +38,7 @@ class SettingsWindowController: NSWindowController {
     private func setupWindow() {
         guard let window, let camera else { return }
 
-        window.title = "Boring Notch Settings"
+        window.title = "Boring Notch Personal Settings"
         window.titlebarAppearsTransparent = false
         window.titleVisibility = .visible
         window.toolbarStyle = .unified
@@ -64,7 +56,7 @@ class SettingsWindowController: NSWindowController {
         window.identifier = NSUserInterfaceItemIdentifier("BoringNotchSettingsWindow")
 
         // Create the SwiftUI content
-        let settingsView = SettingsView(updaterController: updaterController, camera: camera)
+        let settingsView = SettingsView(camera: camera)
         let hostingView = NSHostingView(rootView: settingsView)
         window.contentView = hostingView
 
