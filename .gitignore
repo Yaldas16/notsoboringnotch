@@ -53,3 +53,19 @@ build/
 *.xcarchive
 *.dSYM
 
+
+# Locally packaged releases and test results
+/dist/
+*.dmg
+*.zip
+*.xcresult
+
+# Local tool and credential files
+.codex/
+.agents/
+.env
+.env.*
+*.p12
+*.pfx
+*.key
+*.mobileprovision

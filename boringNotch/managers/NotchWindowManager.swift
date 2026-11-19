@@ -143,8 +143,14 @@ final class NotchWindowManager {
         }
 
         window.contentView = NSHostingView(
-            rootView: ContentView()
-                .environmentObject(viewModel)
+            rootView: ContentView(resizeWindow: { [weak window] height in
+                guard let window, window.frame.height != height else { return }
+                var frame = window.frame
+                frame.origin.y = frame.maxY - height
+                frame.size.height = height
+                window.setFrame(frame, display: true)
+            })
+            .environmentObject(viewModel)
         )
 
         window.orderFrontRegardless()

@@ -11,7 +11,7 @@ import Defaults
 // MARK: - File System Paths
 let documentsDirectory: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
     ?? URL(fileURLWithPath: NSTemporaryDirectory())
-let bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "theboringteam.boringnotch"
+let bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "com.yusuf.boringnotch.personal"
 let appVersion = "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""))"
 
 let temporaryDirectory: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
@@ -341,52 +341,6 @@ enum OSDControlSource: String, CaseIterable, Identifiable, Defaults.Serializable
     }
 }
 
-enum UpdateChannel: String, CaseIterable, Identifiable, Defaults.Serializable {
-    case stable
-    case beta
-    case dev
-
-    var id: String { rawValue }
-
-    static var bundled: UpdateChannel {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: "BNUpdateChannel") as? String,
-              let channel = UpdateChannel(rawValue: value)
-        else {
-            return .stable
-        }
-        return channel
-    }
-
-    static var visibleCases: [UpdateChannel] {
-        // Dev nightlies are intentionally gated away from public stable/beta builds.
-        if bundled == .dev || Defaults[.updateChannel] == .dev {
-            return allCases
-        }
-        return [.stable, .beta]
-    }
-
-    var title: String {
-        switch self {
-        case .stable:
-            return NSLocalizedString("Stable", comment: "Update channel: stable")
-        case .beta:
-            return NSLocalizedString("Beta", comment: "Update channel: beta")
-        case .dev:
-            return NSLocalizedString("Nightly", comment: "Update channel: nightly")
-        }
-    }
-
-    var feedURLString: String {
-        self == .dev
-            ? "https://raw.githubusercontent.com/TheBoredTeam/boring.notch/dev/updater/appcast-dev.xml"
-            : "https://TheBoredTeam.github.io/boring.notch/appcast.xml"
-    }
-
-    var allowedSparkleChannels: Set<String> {
-        self == .stable ? [] : [rawValue]
-    }
-}
-
 enum PreferenceCompatibility {
     /// Runs before Defaults.Key registers its fallback, so a saved false is
     /// distinguishable from a missing value. Keep the old key for older builds.
@@ -414,7 +368,6 @@ extension Defaults.Keys {
     static let automaticallySwitchDisplay = Key<Bool>("automaticallySwitchDisplay", default: true)
     static let followActiveDisplay = Key<Bool>("followActiveDisplay", default: false)
     static let releaseName = Key<String>("releaseName", default: "Dapper Crab 🎩🦀")
-    static let updateChannel = Key<UpdateChannel>("updateChannel", default: UpdateChannel.bundled)
 
     // MARK: Behavior
     static let minimumHoverDuration = Key<TimeInterval>("minimumHoverDuration", default: 0.3)
@@ -461,7 +414,7 @@ extension Defaults.Keys {
     // MARK: Gestures
     static let enableGestures = Key<Bool>("enableGestures", default: true)
     static let enableHorizontalMediaGestures = Key<Bool>("enableHorizontalMediaGestures", default: false)
-    static let closeGestureEnabled = Key<Bool>("closeGestureEnabled", default: true)
+    static let closeGestureEnabled = Key<Bool>("closeGestureEnabled", default: false)
     static let gestureSensitivity = Key<CGFloat>("gestureSensitivity", default: 200.0)
 
     // MARK: Media playback

@@ -6,12 +6,10 @@
 //
 
 import Defaults
-import Sparkle
 import SwiftUI
 
 struct AboutView: View {
     @State private var showBuildNumber: Bool = false
-    let updaterController: SPUStandardUpdaterController
     @Environment(\.openWindow) var openWindow
 
     /// The exact version this build reports, in the format the bug report
@@ -19,9 +17,7 @@ struct AboutView: View {
     private var reportVersion: String {
         let version = Bundle.main.releaseVersionNumber ?? "unknown"
         let build = Bundle.main.buildVersionNumber ?? "unknown"
-        let channel = UpdateChannel.bundled
-        let channelSuffix = channel == .stable ? "" : ", \(channel.rawValue) channel"
-        return "\(version) (build \(build)\(channelSuffix))"
+        return "\(version) (build \(build))"
     }
 
     /// Opens the bug report form with the version fields prefilled via the
@@ -43,6 +39,13 @@ struct AboutView: View {
     var body: some View {
         VStack {
             Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("NotSoBoringNotch").font(.title2.weight(.semibold))
+                        Text("Based on Boring Notch by The Bored Team · GPL-3.0")
+                            .foregroundStyle(.secondary)
+                    }
+                }
                 Section {
                     HStack {
                         Text("Release name")
@@ -69,7 +72,10 @@ struct AboutView: View {
                     Text("Version info")
                 }
 
-                UpdaterSettingsView(updater: updaterController.updater)
+                Section("Software Updates") {
+                    Text("Install updates by rebuilding from local source.")
+                        .foregroundStyle(.secondary)
+                }
 
                 HStack(spacing: 30) {
                     Spacer(minLength: 0)
@@ -97,7 +103,7 @@ struct AboutView: View {
                                 .resizable().scaledToFit()
                                 .frame(width: 18, height: 18)
                                 .foregroundStyle(.primary)
-                            Text("GitHub")
+                            Text("Upstream GitHub")
                         }
                         .contentShape(Rectangle())
                     }
@@ -115,9 +121,6 @@ struct AboutView: View {
                     .padding(.horizontal, 10)
             }
             .frame(maxWidth: .infinity, alignment: .center)
-        }
-        .toolbar {
-            CheckForUpdatesView(updater: updaterController.updater)
         }
         .navigationTitle("About")
     }

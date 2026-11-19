@@ -25,7 +25,11 @@ struct ContentView: View {
     /// Which entry of the closed-notch activity stack is on top.
     @State private var activityIndex: Int = 0
     @State private var hoverTask: Task<Void, Never>?
+    @State private var pointerInsideNotch = false
     @State private var isHovering: Bool = false
+    @State private var isGPTComposerFocused = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    var resizeWindow: (CGFloat) -> Void = { _ in }
     @State private var anyDropDebounceTask: Task<Void, Never>?
 
     @State private var gestureProgress: CGFloat = .zero
@@ -38,9 +42,10 @@ struct ContentView: View {
     @Namespace var albumArtNamespace
 
     @Default(.showNotHumanFace) var showNotHumanFace
+    @Default(.closeGestureEnabled) private var closeGestureEnabled
 
     // Use standardized animations from StandardAnimations enum
-    private let animationSpring = StandardAnimations.interactive
+    private var animationSpring: Animation? { reduceMotion ? nil : StandardAnimations.interactive }
 
     private let extendedHoverPadding: CGFloat = 30
     private let zeroHeightHoverPadding: CGFloat = 10
@@ -133,7 +138,22 @@ struct ContentView: View {
     /// lever anyway.
     private var openNotchHeight: CGFloat? {
         if notificationManager.activeNotification != nil { return 132 }
+        if showsGPTPanel { return gptPanelHeight }
         return Defaults[.compactMode] ? nil : vm.notchSize.height
+    }
+
+    private var showsGPTPanel: Bool {
+        showsHeader && coordinator.currentView == .gpt
+    }
+
+    private var gptPanelHeight: CGFloat {
+        let displayHeight = vm.screenUUID.flatMap { NSScreen.screen(withUUID: $0) }?.visibleFrame.height
+            ?? NSScreen.main?.visibleFrame.height ?? 900
+        return min(370, max(240, displayHeight * 0.4))
+    }
+
+    private var notchWindowHeight: CGFloat {
+        showsGPTPanel ? gptPanelHeight + shadowPadding : windowSize.height
     }
 
     /// Compact mode drops the tab bar along with the tabs it switches
@@ -294,6 +314,7 @@ struct ContentView: View {
                         return view
                             .animation(vm.notchState == .open ? StandardAnimations.open : StandardAnimations.close, value: vm.notchState)
                             .animation(.smooth, value: gestureProgress)
+                            .animation(reduceMotion ? nil : .smooth(duration: 0.22), value: showsGPTPanel)
                             // Outermost on purpose: it only fires when the
                             // closed-state content changes (the key is stable
                             // across open/close), and when several keys change
@@ -316,7 +337,7 @@ struct ContentView: View {
                                 handleDownGesture(translation: translation, phase: phase)
                             }
                     }
-                    .conditionalModifier(Defaults[.closeGestureEnabled] && Defaults[.enableGestures] && !shouldDisplayNowPlayingFallbackNotice) { view in
+                    .conditionalModifier(closeGestureEnabled && Defaults[.enableGestures] && !shouldDisplayNowPlayingFallbackNotice) { view in
                         view
                             .panGesture(direction: .up) { translation, phase in
                                 handleUpGesture(translation: translation, phase: phase)
@@ -332,7 +353,7 @@ struct ContentView: View {
                             }
                     }
                     .onReceive(NotificationCenter.default.publisher(for: .sharingDidFinish)) { _ in
-                        scheduleCloseIfNotHovering(overNotch: vm)
+                        scheduleCloseIfNotHovering()
                     }
                     // A new notification always takes the front of the stack,
                     // even if the user had swiped away to music.
@@ -347,7 +368,10 @@ struct ContentView: View {
                         if activityIndex >= count { activityIndex = max(count - 1, 0) }
                     }
                     .onChange(of: vm.isPopoverActive) { _, _ in
-                        scheduleCloseIfNotHovering(overNotch: vm)
+                        scheduleCloseIfNotHovering()
+                    }
+                    .onChange(of: isGPTComposerFocused) { _, focused in
+                        if !focused { scheduleCloseIfNotHovering() }
                     }
                     .sensoryFeedback(.alignment, trigger: haptics)
                     .contextMenu {
@@ -371,7 +395,10 @@ struct ContentView: View {
             }
         }
         .padding(.bottom, 8)
-        .frame(maxWidth: windowSize.width, maxHeight: windowSize.height, alignment: .top)
+        .frame(maxWidth: windowSize.width, maxHeight: notchWindowHeight, alignment: .top)
+        .onChange(of: notchWindowHeight, initial: true) { _, height in
+            resizeWindow(height)
+        }
         .ignoresSafeArea(.all)
         .compositingGroup()
         .scaleEffect(
@@ -405,9 +432,7 @@ struct ContentView: View {
                 }
 
                 dropInteraction.dropEvent = false
-                if !SharingStateManager.shared.preventNotchClose {
-                    vm.close()
-                }
+                if canCloseOnPointerExit { vm.close() }
             }
         }
     }
@@ -580,6 +605,18 @@ struct ContentView: View {
                                 dropInteraction: vm.dropInteraction,
                                 animation: vm.animation
                             )
+                        case .gpt:
+                            GPTChatView(
+                                conversation: .shared,
+                                openWindow: {
+                                    let screen = vm.screenUUID.flatMap { NSScreen.screen(withUUID: $0) }
+                                    GPTChatWindowController.shared.open(on: screen ?? NSScreen.main)
+                                },
+                                editingChanged: { isGPTComposerFocused = $0 },
+                                attachmentPopoverChanged: { vm.isPopoverActive = $0 }
+                            )
+                            .frame(width: openNotchSize.width - 2 * (openedInsets.top + 12),
+                                   height: gptPanelHeight - max(38, displayClosedNotchHeight) - 22)
                         }
                     }
                 }
@@ -822,99 +859,71 @@ extension ContentView {
 
     // MARK: - Hover Management
 
-    /// Closes the open notch after the hover grace period unless a popover
-    /// still owns the pointer.
-    private func scheduleCloseIfNotHovering(overNotch notchViewModel: BoringViewModel) {
-        guard notchViewModel.notchState == .open,
-              !isHovering,
-              !notchViewModel.isPopoverActive else { return }
+    private var canDismissNotch: Bool {
+        !isGPTComposerFocused && !vm.isPopoverActive && !SharingStateManager.shared.preventNotchClose
+    }
+
+    private var canCloseOnPointerExit: Bool {
+        vm.notchState == .open && !pointerInsideNotch && canDismissNotch
+    }
+
+    private func scheduleCloseIfNotHovering() {
+        if canCloseOnPointerExit { scheduleHoverExit() }
+    }
+
+    private func scheduleHoverExit() {
         hoverTask?.cancel()
-        hoverTask = Task {
+        hoverTask = Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(hoverExitDelayMilliseconds))
-            guard !Task.isCancelled else { return }
-            await MainActor.run {
-                if self.vm.notchState == .open,
-                   !self.isHovering,
-                   !self.vm.isPopoverActive,
-                   !SharingStateManager.shared.preventNotchClose {
-                    self.vm.close()
-                }
+            guard !Task.isCancelled, !pointerInsideNotch else { return }
+
+            if isHovering {
+                withAnimation(animationSpring) { isHovering = false }
+                notificationManager.resumeDismiss()
             }
+            if canCloseOnPointerExit { vm.close() }
         }
     }
 
     private func handleHover(_ hovering: Bool) {
-        if coordinator.firstLaunch { return }
+        guard !coordinator.firstLaunch, pointerInsideNotch != hovering else { return }
+        pointerInsideNotch = hovering
         hoverTask?.cancel()
 
-        if hovering {
-            withAnimation(animationSpring) {
-                isHovering = true
-            }
+        guard hovering else {
+            scheduleHoverExit()
+            return
+        }
 
-            // Freeze the dismiss countdown the moment the pointer arrives,
-            // not when the notch finishes opening. Opening waits out
-            // minimumHoverDuration plus an animation, and a notification
-            // near the end of its life would expire during that — so it
-            // vanished exactly as the notch opened around it.
-            if notificationManager.activeNotification != nil {
-                notificationManager.holdActive()
-            }
+        withAnimation(animationSpring) { isHovering = true }
+        // Pause the notification countdown while the pointer is here, even before the notch opens.
+        if notificationManager.activeNotification != nil { notificationManager.holdActive() }
+        if vm.notchState == .closed && Defaults[.enableHaptics] { haptics.toggle() }
 
-            if vm.notchState == .closed && Defaults[.enableHaptics] {
-                haptics.toggle()
-            }
+        guard vm.notchState == .closed,
+              !shouldDisplayNowPlayingFallbackNotice,
+              !coordinator.shouldShowSneakPeek(on: vm.screenUUID),
+              Defaults[.openNotchOnHover] else { return }
 
-            guard vm.notchState == .closed,
+        hoverTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(Defaults[.minimumHoverDuration]))
+            guard !Task.isCancelled, pointerInsideNotch, vm.notchState == .closed,
+                  Defaults[.openNotchOnHover],
                   !shouldDisplayNowPlayingFallbackNotice,
-                  !coordinator.shouldShowSneakPeek(on: vm.screenUUID),
-                  Defaults[.openNotchOnHover] else { return }
+                  !coordinator.shouldShowSneakPeek(on: vm.screenUUID) else { return }
 
-            hoverTask = Task {
-                try? await Task.sleep(for: .seconds(Defaults[.minimumHoverDuration]))
-                guard !Task.isCancelled else { return }
-
-                await MainActor.run {
-                    guard self.vm.notchState == .closed,
-                          self.isHovering,
-                          !self.shouldDisplayNowPlayingFallbackNotice,
-                          !self.coordinator.shouldShowSneakPeek(on: self.vm.screenUUID) else { return }
-
-                    self.doOpen()
-                }
-            }
-        } else {
-            hoverTask = Task {
-                try? await Task.sleep(for: .milliseconds(hoverExitDelayMilliseconds))
-                guard !Task.isCancelled else { return }
-
-                await MainActor.run {
-                    withAnimation(animationSpring) {
-                        self.isHovering = false
-                    }
-
-                    // Pointer left — let the notification age out again.
-                    self.notificationManager.resumeDismiss()
-
-                    if self.vm.notchState == .open,
-                       !self.vm.isPopoverActive,
-                       !SharingStateManager.shared.preventNotchClose {
-                        self.vm.close()
-                    }
-                }
-            }
+            doOpen()
         }
     }
 
     // MARK: - Gesture Handling
 
     private func handleDownGesture(translation: CGFloat, phase: NSEvent.Phase) {
-        guard vm.notchState == .closed else { return }
-
-        if phase == .ended {
+        if phase == .ended || phase == .cancelled {
             withAnimation(animationSpring) { gestureProgress = .zero }
             return
         }
+        guard vm.notchState == .closed else { return }
 
         withAnimation(animationSpring) {
             gestureProgress = (translation / Defaults[.gestureSensitivity]) * 20
@@ -932,30 +941,24 @@ extension ContentView {
     }
 
     private func handleUpGesture(translation: CGFloat, phase: NSEvent.Phase) {
+        if phase == .ended || phase == .cancelled || !canDismissNotch {
+            withAnimation(animationSpring) { gestureProgress = .zero }
+            return
+        }
         guard vm.notchState == .open && !vm.isHoveringCalendar else { return }
+        if showsGPTPanel, let screenFrame = getScreenFrame(vm.screenUUID),
+           NSEvent.mouseLocation.y < screenFrame.maxY - max(38, displayClosedNotchHeight) {
+            withAnimation(animationSpring) { gestureProgress = .zero }
+            return
+        }
 
+        let sensitivity = Defaults[.gestureSensitivity]
         withAnimation(animationSpring) {
-            gestureProgress = (translation / Defaults[.gestureSensitivity]) * -20
+            gestureProgress = translation > sensitivity ? .zero : (translation / sensitivity) * -20
         }
-
-        if phase == .ended {
-            withAnimation(animationSpring) {
-                gestureProgress = .zero
-            }
-        }
-
-        if translation > Defaults[.gestureSensitivity] {
-            withAnimation(animationSpring) {
-                isHovering = false
-            }
-            if !SharingStateManager.shared.preventNotchClose {
-                gestureProgress = .zero
-                vm.close()
-            }
-
-            if Defaults[.enableHaptics] {
-                haptics.toggle()
-            }
+        if translation > sensitivity {
+            vm.close()
+            if Defaults[.enableHaptics] { haptics.toggle() }
         }
     }
 

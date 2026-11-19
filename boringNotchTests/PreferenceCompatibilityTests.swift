@@ -3,6 +3,7 @@
 //  boringNotchTests
 //
 
+import Defaults
 import Foundation
 import XCTest
 @testable import boringNotch
@@ -127,80 +128,46 @@ final class PreferenceCompatibilityTests: XCTestCase {
             }
         }
     }
-}
-
-@MainActor
-final class LegacyAppBundleMigrationTests: XCTestCase {
-    private var temporaryDirectory: URL!
-    private let fileManager = FileManager.default
-
-    override func setUpWithError() throws {
-        temporaryDirectory = fileManager.temporaryDirectory
-            .appendingPathComponent("LegacyAppBundleMigrationTests-\(UUID().uuidString)", isDirectory: true)
-        try fileManager.createDirectory(at: temporaryDirectory, withIntermediateDirectories: true)
-    }
-
-    override func tearDownWithError() throws {
-        if let temporaryDirectory {
-            try fileManager.removeItem(at: temporaryDirectory)
+    func testCloseGestureDefaultsToOffAndPreservesExistingChoices() throws {
+        let currentKey = Defaults.Keys.closeGestureEnabled
+        XCTAssertEqual(currentKey.name, "closeGestureEnabled")
+        XCTAssertFalse(currentKey.defaultValue)
+        try withSuite { defaults, domain in
+            let key = Defaults.Key<Bool>(currentKey.name, default: currentKey.defaultValue, suite: defaults)
+            XCTAssertFalse(Defaults[key])
+            XCTAssertNil(defaults.persistentDomain(forName: domain)?[key.name])
+            for saved in [true, false] {
+                defaults.set(saved, forKey: key.name)
+                let upgradedKey = Defaults.Key<Bool>(key.name, default: false, suite: defaults)
+                XCTAssertEqual(Defaults[upgradedKey], saved)
+            }
         }
     }
 
-    func testMigratesOnlyTheLegacyProductName() throws {
-        let legacyURL = temporaryDirectory
-            .appendingPathComponent(LegacyAppBundleMigration.legacyBundleName, isDirectory: true)
-        let destinationURL = temporaryDirectory
-            .appendingPathComponent(LegacyAppBundleMigration.currentBundleName, isDirectory: true)
-        let markerURL = legacyURL.appendingPathComponent("marker")
-        try fileManager.createDirectory(at: legacyURL, withIntermediateDirectories: true)
-        try Data("updated".utf8).write(to: markerURL)
-
-        let migratedURL = try XCTUnwrap(
-            LegacyAppBundleMigration.migrateIfNeeded(at: legacyURL, fileManager: fileManager)
-        )
-
-        XCTAssertEqual(migratedURL.standardizedFileURL, destinationURL.standardizedFileURL)
-        XCTAssertFalse(fileManager.fileExists(atPath: legacyURL.path))
-        XCTAssertEqual(try Data(contentsOf: destinationURL.appendingPathComponent("marker")), Data("updated".utf8))
+    func testAIIntroductionRunsOnceAfterOriginalOnboardingOrWhenUpgrading() throws {
+        try withSuite { defaults, domain in
+            XCTAssertFalse(GPTIntroductionPreference.shouldShow(firstLaunch: true, in: defaults))
+            XCTAssertTrue(GPTIntroductionPreference.shouldShow(firstLaunch: false, in: defaults))
+            XCTAssertNil(defaults.persistentDomain(forName: domain))
+            GPTIntroductionPreference.complete(in: defaults)
+            let nextLaunch = try XCTUnwrap(UserDefaults(suiteName: domain))
+            XCTAssertFalse(GPTIntroductionPreference.shouldShow(firstLaunch: false, in: nextLaunch))
+            XCTAssertEqual(nextLaunch.persistentDomain(forName: domain)?.count, 1)
+        }
     }
 
-    func testMigrationDestinationIsTheRenamedSibling() throws {
-        let legacyURL = temporaryDirectory
-            .appendingPathComponent(LegacyAppBundleMigration.legacyBundleName, isDirectory: true)
-
-        XCTAssertEqual(
-            LegacyAppBundleMigration.destinationURL(for: legacyURL)?.lastPathComponent,
-            LegacyAppBundleMigration.currentBundleName
-        )
-        XCTAssertEqual(
-            LegacyAppBundleMigration.destinationURL(for: legacyURL)?.deletingLastPathComponent(),
-            temporaryDirectory.standardizedFileURL
-        )
+    func testSelectedTextAndLanguageChoicesPersistIndependently() throws {
+        try withSuite { defaults, domain in
+            XCTAssertTrue(AskGPTPreferences.serviceIsDeclared)
+            XCTAssertTrue(AskGPTPreferences.isEnabled(in: defaults))
+            defaults.set(false, forKey: AskGPTPreferences.enabledKey)
+            defaults.set("tr", forKey: AskGPTPreferences.languageKey)
+            let nextLaunch = try XCTUnwrap(UserDefaults(suiteName: domain))
+            XCTAssertFalse(AskGPTPreferences.isEnabled(in: nextLaunch))
+            let saved = try XCTUnwrap(nextLaunch.string(forKey: AskGPTPreferences.languageKey))
+            XCTAssertEqual(AskGPTPreferences.language(saved), .tr)
+            XCTAssertEqual(AskGPTPreferences.language("invalid"), .preferred())
+        }
     }
 
-    func testCurrentProductNameIsNotMoved() throws {
-        let currentURL = temporaryDirectory
-            .appendingPathComponent(LegacyAppBundleMigration.currentBundleName, isDirectory: true)
-        try fileManager.createDirectory(at: currentURL, withIntermediateDirectories: true)
-
-        XCTAssertNil(
-            try LegacyAppBundleMigration.migrateIfNeeded(at: currentURL, fileManager: fileManager)
-        )
-        XCTAssertTrue(fileManager.fileExists(atPath: currentURL.path))
-    }
-
-    func testExistingDestinationIsNeverOverwritten() throws {
-        let legacyURL = temporaryDirectory
-            .appendingPathComponent(LegacyAppBundleMigration.legacyBundleName, isDirectory: true)
-        let destinationURL = temporaryDirectory
-            .appendingPathComponent(LegacyAppBundleMigration.currentBundleName, isDirectory: true)
-        try fileManager.createDirectory(at: legacyURL, withIntermediateDirectories: true)
-        try fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true)
-
-        XCTAssertThrowsError(
-            try LegacyAppBundleMigration.migrateIfNeeded(at: legacyURL, fileManager: fileManager)
-        )
-        XCTAssertTrue(fileManager.fileExists(atPath: legacyURL.path))
-        XCTAssertTrue(fileManager.fileExists(atPath: destinationURL.path))
-    }
 }

@@ -5,7 +5,6 @@
 //  Created by Richard Kunkli on 07/08/2024.
 //
 
-import Sparkle
 import SwiftUI
 import SwiftUIIntrospect
 
@@ -21,6 +20,7 @@ private enum SettingsTab: String, CaseIterable, Identifiable {
     case osd
     case notifications
     case shortcuts
+    case gpt
     case about
 
     enum Icon {
@@ -43,6 +43,7 @@ private enum SettingsTab: String, CaseIterable, Identifiable {
         case .osd: "OSD"
         case .notifications: "Notifications"
         case .shortcuts: "Shortcuts"
+        case .gpt: "GPT"
         case .about: "About"
         }
     }
@@ -60,6 +61,7 @@ private enum SettingsTab: String, CaseIterable, Identifiable {
         case .osd: .system("dial.medium.fill")
         case .notifications: .system("bell.badge")
         case .shortcuts: .system("keyboard")
+        case .gpt: .system("sparkle")
         case .about: .system("info.circle")
         }
     }
@@ -69,13 +71,7 @@ struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
     @State private var accentColorUpdateTrigger = UUID()
 
-    let updaterController: SPUStandardUpdaterController?
     let camera: CameraModel
-
-    init(updaterController: SPUStandardUpdaterController? = nil, camera: CameraModel) {
-        self.updaterController = updaterController
-        self.camera = camera
-    }
 
     var body: some View {
         NavigationSplitView {
@@ -113,16 +109,10 @@ struct SettingsView: View {
                     WebcamSettingsView(camera: camera)
                 case .shortcuts:
                     ShortcutsSettingsView()
+                case .gpt:
+                    GPTAccountSettingsView()
                 case .about:
-                    if let controller = updaterController {
-                        AboutView(updaterController: controller)
-                    } else {
-                        // Fallback with a default controller
-                        AboutView(
-                            updaterController: SPUStandardUpdaterController(
-                                startingUpdater: false, updaterDelegate: nil,
-                                userDriverDelegate: nil))
-                    }
+                    AboutView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

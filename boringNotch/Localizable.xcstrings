@@ -3652,102 +3652,102 @@
         }
       }
     },
-    "Boring Notch" : {
+    "NotSoBoringNotch" : {
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         },
         "zh-Hant-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch"
+            "value" : "NotSoBoringNotch"
           }
         }
       }
@@ -3823,125 +3823,125 @@
         }
       }
     },
-    "Boring Notch could not verify Now Playing. Try again, or reopen the app if it keeps happening." : {
+    "NotSoBoringNotch could not verify Now Playing. Try again, or reopen the app if it keeps happening." : {
       "comment" : "Recoverable Now Playing probe failure message.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch could not verify Now Playing. Try again, or reopen the app if it keeps happening."
+            "value" : "NotSoBoringNotch could not verify Now Playing. Try again, or reopen the app if it keeps happening."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch no pudo verificar la Reproduciendo Ahora. Inténtalo de nuevo o vuelve a abrir la aplicación si sigue sucediendo."
+            "value" : "NotSoBoringNotch no pudo verificar la Reproduciendo Ahora. Inténtalo de nuevo o vuelve a abrir la aplicación si sigue sucediendo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch n'a pas pu vérifier « À l'écoute ». Essayez à nouveau, ou rouvrez l'application si cela continue de se produire."
+            "value" : "NotSoBoringNotch n'a pas pu vérifier « À l'écoute ». Essayez à nouveau, ou rouvrez l'application si cela continue de se produire."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch kon niet controleren of ‘Huidig onderdeel’ beschikbaar is. Probeer het opnieuw of open de app opnieuw als het probleem blijft optreden."
+            "value" : "NotSoBoringNotch kon niet controleren of ‘Huidig onderdeel’ beschikbaar is. Probeer het opnieuw of open de app opnieuw als het probleem blijft optreden."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O Boring Notch não pôde verificar a Reprodução agora. Tente novamente ou reabra o aplicativo se continuar acontecendo."
+            "value" : "O NotSoBoringNotch não pôde verificar a Reprodução agora. Tente novamente ou reabra o aplicativo se continuar acontecendo."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch, Şu An Çalınan içeriği doğrulayamadı. Tekrar deneyin, sorun sürerse uygulamayı kapatıp yeniden açın."
+            "value" : "NotSoBoringNotch, Şu An Çalınan içeriği doğrulayamadı. Tekrar deneyin, sorun sürerse uygulamayı kapatıp yeniden açın."
           }
         }
       }
     },
-    "Boring Notch lost its Now Playing connection. Reconnecting automatically..." : {
+    "NotSoBoringNotch lost its Now Playing connection. Reconnecting automatically..." : {
       "comment" : "Now Playing runtime failure message shown before an automatic recovery attempt.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch lost its Now Playing connection. Reconnecting automatically..."
+            "value" : "NotSoBoringNotch lost its Now Playing connection. Reconnecting automatically..."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch perdió la conexión con la Reproduciendo Ahora. Reconectando automáticamente..."
+            "value" : "NotSoBoringNotch perdió la conexión con la Reproduciendo Ahora. Reconectando automáticamente..."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch a perdu le lien avec « À l'écoute ». Reconnexion en cours..."
+            "value" : "NotSoBoringNotch a perdu le lien avec « À l'écoute ». Reconnexion en cours..."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch ha perso la connessione alla Riproduzione in corso. Riconessione automatica..."
+            "value" : "NotSoBoringNotch ha perso la connessione alla Riproduzione in corso. Riconessione automatica..."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch heeft de verbinding met ‘Huidig onderdeel’ verloren. Er wordt automatisch opnieuw verbinding gemaakt..."
+            "value" : "NotSoBoringNotch heeft de verbinding met ‘Huidig onderdeel’ verloren. Er wordt automatisch opnieuw verbinding gemaakt..."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch perdeu sua conexão com reproduzindo agora. Reconectando automaticamente..."
+            "value" : "NotSoBoringNotch perdeu sua conexão com reproduzindo agora. Reconectando automaticamente..."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch, Şu An Çalınıyor bağlantısını kaybetti. Otomatik olarak yeniden bağlanılıyor..."
+            "value" : "NotSoBoringNotch, Şu An Çalınıyor bağlantısını kaybetti. Otomatik olarak yeniden bağlanılıyor..."
           }
         }
       }
     },
-    "Boring Notch's Now Playing components are unavailable. Reopen or reinstall the app." : {
+    "NotSoBoringNotch's Now Playing components are unavailable. Reopen or reinstall the app." : {
       "comment" : "Now Playing setup failure message shown when required bundled components cannot be used.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch's Now Playing components are unavailable. Reopen or reinstall the app."
+            "value" : "NotSoBoringNotch's Now Playing components are unavailable. Reopen or reinstall the app."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los componentes de Reproduciendo Ahora de Boring Notch no están disponibles. Vuelve a abrir o reinstala la aplicación."
+            "value" : "Los componentes de Reproduciendo Ahora de NotSoBoringNotch no están disponibles. Vuelve a abrir o reinstala la aplicación."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les composants « À l'écoute » de Boring Notch ne sont pas disponibles. Redémarrez ou réinstallez l'application."
+            "value" : "Les composants « À l'écoute » de NotSoBoringNotch ne sont pas disponibles. Redémarrez ou réinstallez l'application."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I componenti della Riproduzione in corso di Boring Notch non sono disponibili. Riapri o reinstalla l'app."
+            "value" : "I componenti della Riproduzione in corso di NotSoBoringNotch non sono disponibili. Riapri o reinstalla l'app."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "De ‘Huidig onderdeel’ componenten van Boring Notch zijn niet beschikbaar. Open de app opnieuw of installeer deze opnieuw."
+            "value" : "De ‘Huidig onderdeel’ componenten van NotSoBoringNotch zijn niet beschikbaar. Open de app opnieuw of installeer deze opnieuw."
           }
         },
         "pt-BR" : {
@@ -3953,7 +3953,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Boring Notch'un Şu An Çalınan bileşenleri şu anda kullanılamıyor. Uygulamayı yeniden açın ya da tekrar yükleyin."
+            "value" : "NotSoBoringNotch'un Şu An Çalınan bileşenleri şu anda kullanılamıyor. Uygulamayı yeniden açın ya da tekrar yükleyin."
           }
         }
       }
@@ -4978,24 +4978,24 @@
         }
       }
     },
-    "Changing the app language requires restarting Boring Notch." : {
+    "Changing the app language requires restarting NotSoBoringNotch." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Ändern der App-Sprache erfordert einen Neustart von Boring Notch."
+            "value" : "Das Ändern der App-Sprache erfordert einen Neustart von NotSoBoringNotch."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Changing the app language requires restarting Boring Notch."
+            "value" : "Changing the app language requires restarting NotSoBoringNotch."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cambiar el idioma de la aplicación requiere reiniciar Boring Notch."
+            "value" : "Cambiar el idioma de la aplicación requiere reiniciar NotSoBoringNotch."
           }
         },
         "fr" : {
@@ -5007,49 +5007,49 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La modifica della lingua dell'app richiede il riavvio di Boring Notch."
+            "value" : "La modifica della lingua dell'app richiede il riavvio di NotSoBoringNotch."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アプリの言語を変更するにはBoring Notchを再起動する必要があります。"
+            "value" : "アプリの言語を変更するにはNotSoBoringNotchを再起動する必要があります。"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Om de taal van de app te wijzigen, moet je Boring Notch opnieuw opstarten."
+            "value" : "Om de taal van de app te wijzigen, moet je NotSoBoringNotch opnieuw opstarten."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alterar o idioma do aplicativo requer reiniciar o Boring Notch."
+            "value" : "Alterar o idioma do aplicativo requer reiniciar o NotSoBoringNotch."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Изменение языка приложения требует перезапуска Boring Notch."
+            "value" : "Изменение языка приложения требует перезапуска NotSoBoringNotch."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uygulama dilini değiştirmek için Boring Notch'u yeniden başlatmak gerekir."
+            "value" : "Uygulama dilini değiştirmek için NotSoBoringNotch'u yeniden başlatmak gerekir."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Зміна мови програми вимагає перезапуску Boring Notch."
+            "value" : "Зміна мови програми вимагає перезапуску NotSoBoringNotch."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更改应用语言需要重启 Boring Notch。"
+            "value" : "更改应用语言需要重启 NotSoBoringNotch。"
           }
         }
       }
