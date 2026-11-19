@@ -42,6 +42,7 @@ jobs:
       - name: Package and verify the extracted app
         run: |
           set -euo pipefail
+          trap 'echo "::error::Bundle verification failed at line $LINENO: $BASH_COMMAND"' ERR
           source_app="$RUNNER_TEMP/derived/Build/Products/Release/$APP_NAME.app"
           zip="$RUNNER_TEMP/Boring-Notch-Personal-arm64.zip"
           test -d "$source_app"
@@ -72,7 +73,7 @@ jobs:
           test "$(lipo -archs "$executable")" = arm64
           for binary in "$helper/Contents/MacOS/BoringNotchXPCHelper" "$framework/MediaRemoteAdapter" "$media_client"; do
             test -x "$binary"
-            lipo -verify_arch arm64 "$binary"
+            lipo "$binary" -verify_arch arm64
           done
           codesign --verify --deep --strict --verbose=2 "$app"
           codesign --verify --strict --verbose=2 "$media_client"
